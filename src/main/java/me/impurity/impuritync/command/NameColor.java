@@ -114,20 +114,14 @@ public class NameColor implements CommandExecutor, Listener {
         }
         return true;
     }
-    
-    // Join event things. Currently not cancellable.
 
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    public void onJoin(PlayerJoinEvent event) {
-        Player player = event.getPlayer();
-        if (ImpurityNC.getPlugin().getPlayers().contains(String.valueOf(player.getUniqueId()))) {
-            if (player.hasPermission("ImpurityNC.use")) {
-                player.setDisplayName(ImpurityNC.getPlugin().getPlayers().getString(String.valueOf(player.getUniqueId())) + ChatColor.RESET);
-            } else {
-                player.setDisplayName(player.getName());
-            }
-        }
-        event.setJoinMessage(ChatColor.GRAY + player.getDisplayName() + ChatColor.GRAY + " joined");
+    private void setDisplayName(Player player, String name) {
+        name = name.replace("§k", "") + ChatColor.RESET;
+        player.setDisplayName(name);
+        util.sendMessage(player, "&6Your name is now: &r" + name);
+        inc.getPlayers().set(String.valueOf(player.getUniqueId()), name);
+        inc.saveConfig();
+        inc.reloadPlayerData();
     }
 
     private String available() {
