@@ -1,7 +1,7 @@
 name: ImpurityNC
 version: ${project.version}
 main: me.impurity.impuritync.ImpurityNC
-authors: [SevJ6]
+authors: [SevJ6, CM8DoubleCheck]
 description: Name color plugin for impurity.me
 commands:
   nc:
