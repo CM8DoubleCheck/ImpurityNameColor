@@ -1,6 +1,7 @@
 package me.impurity.impuritync.command;
 
 import me.impurity.impuritync.ImpurityNC;
+import me.impurity.impuritync.Util;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -12,100 +13,87 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class NameColor implements CommandExecutor, Listener {
+public class NameColor implements CommandExecutor {
+
+    private final ImpurityNC inc;
+    private final Util util;
+    public NameColor(ImpurityNC inc) {
+        this.inc = inc;
+        util = inc.getUtil();
+    }
+
+    private final String AVAILABLE_COLORS = "&4dark_red &cred &6gold &eyellow &2dark_green &agreen &baqua &3dark_aqua &1dark_blue &9blue &dlight_purple &5dark_purple &7gray &8dark_gray &0black&r &4r&6a&ei&2n&9b&1o&5w&r &lbold&r &mstrikethrough&r &nunderline&r &oitalic&r random reset";
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (sender instanceof Player) {
+        if (!(sender instanceof Player)) {
+            util.sendMessage(sender, "&cYou must be a player to do that!");
+        } else {
             Player player = (Player) sender;
             if (player.hasPermission("ImpurityNC.use")) {
                 if (args.length > 0) {
-                    if (args[0].equalsIgnoreCase("random")) {
 
-                        /*
-                        Arguments "random" and "rainbow" are inspired from an open source
-                        name color plugin, "LeeesNC."
-                        You can view LeeesNC at https://github.com/XeraPlugins/LeeesNC
-                        */
+                    StringBuilder builder = new StringBuilder();
+                    List<Character> chars = new ArrayList<>();
+                    List<ChatColor> colors;
 
-                        List<ChatColor> colors = Arrays.asList(ChatColor.values());
-
-                        StringBuilder randomBuilder = new StringBuilder();
-                        List<Character> chars = new ArrayList<>();
-
-                        for (int i = 0; i < player.getName().length(); i++) {
-                            char c = player.getName().charAt(i);
-                            chars.add(c);
-                        }
-                        int i = 0;
-                        for (Character letter : chars) {
-                            if (i == colors.size()) {
-                                i = 0;
-                            }
-                            int index = ThreadLocalRandom.current().nextInt(colors.size());
-                            randomBuilder.append(colors.get(index)).append(letter);
-                            i++;
-                        }
-                        player.setDisplayName(randomBuilder.toString().replace("§k", "") + ChatColor.RESET);
-                        ImpurityNC.sendMessage(player, "&6Your name is now: &r" + randomBuilder.toString().replace("§k", ""));
-                        ImpurityNC.getPlugin().getPlayers().set(String.valueOf(player.getUniqueId()), randomBuilder.toString().replace("§k", ""));
-                        ImpurityNC.getPlugin().saveConfig();
-                        ImpurityNC.getPlugin().reloadPlayers();
-                    } else {
-                        if (args[0].equalsIgnoreCase("rainbow")) {
-                            List<ChatColor> colors = Arrays.asList(ChatColor.DARK_RED, ChatColor.GOLD, ChatColor.YELLOW, ChatColor.DARK_GREEN, ChatColor.BLUE, ChatColor.DARK_BLUE, ChatColor.DARK_PURPLE);
-
-                            StringBuilder rainbowBuilder = new StringBuilder();
-                            List<Character> chars = new ArrayList<>();
+                    switch(args[0].toLowerCase()) {
+                        case "random":
+                            /*
+                            Arguments "random" and "rainbow" are inspired from an open source
+                            name color plugin, "LeeesNC."
+                            You can view LeeesNC at https://github.com/XeraPlugins/LeeesNC
+                            */
+                             colors = Arrays.asList(ChatColor.values());
 
                             for (int i = 0; i < player.getName().length(); i++) {
                                 char c = player.getName().charAt(i);
                                 chars.add(c);
                             }
-                            int i = 0;
-                            for (Character letter : chars) {
+
+                            for (int i = 0; i < chars.size(); i++) {
                                 if (i == colors.size()) {
                                     i = 0;
                                 }
-                                rainbowBuilder.append(colors.get(i)).append(letter);
-                                i++;
+                                int index = ThreadLocalRandom.current().nextInt(colors.size());
+                                builder.append(colors.get(index)).append(chars.get(i));
                             }
-                            player.setDisplayName(rainbowBuilder.toString() + ChatColor.RESET);
-                            ImpurityNC.sendMessage(player, "&6Your name is now: &r" + rainbowBuilder.toString());
-                            ImpurityNC.getPlugin().getPlayers().set(String.valueOf(player.getUniqueId()), rainbowBuilder.toString().replace("§k", ""));
-                            ImpurityNC.getPlugin().saveConfig();
-                            ImpurityNC.getPlugin().reloadPlayers();
-                        } else {
+                            setDisplayName(player, builder.toString());
+                            break;
+                        case "rainbow":
+                            colors = Arrays.asList(ChatColor.DARK_RED, ChatColor.GOLD, ChatColor.YELLOW, ChatColor.DARK_GREEN, ChatColor.BLUE, ChatColor.DARK_BLUE, ChatColor.DARK_PURPLE);
 
-                            /*
-                            Continue code if aguments are not "rainbow" or "random"
-                            Instead of making a plethora of switch case statements,
-                            we loop through args and define variable c as the color
-                            value of args.
-                            */
+                            for (int i = 0; i < player.getName().length(); i++) {
+                                char c = player.getName().charAt(i);
+                                chars.add(c);
+                            }
 
+                            for (int i = 0; i < chars.size(); i++) {
+                                if (i == colors.size()) {
+                                    i = 0;
+                                }
+                                builder.append(colors.get(i)).append(chars.get(i));
+                            }
+                            setDisplayName(player, builder.toString());
+                            break;
+                        default:
                             try {
-                                StringBuilder builder = new StringBuilder();
                                 for (String arg : args) {
                                     ChatColor c = ChatColor.valueOf(arg.toUpperCase().replace("magic", ""));
                                     builder.append(c);
                                 }
-                                player.setDisplayName(builder.toString().replace("§k", "") + player.getName() + ChatColor.RESET);
-                                ImpurityNC.getPlugin().getPlayers().set(String.valueOf(player.getUniqueId()), builder.toString().replace("§k", "") + player.getName());
-                                ImpurityNC.getPlugin().saveConfig();
-                                ImpurityNC.getPlugin().reloadPlayers();
-                                ImpurityNC.sendMessage(player, "&6Your name is now: &r" + builder.toString().replace("§k", "") + player.getName());
+                                setDisplayName(player, builder.toString());
                             } catch (IllegalArgumentException ignored) {
-                                ImpurityNC.sendMessage(player, "&4Invalid color type!");
-                                ImpurityNC.sendMessage(player, "&6Available formats:" + "\n" + available());
+                                util.sendMessage(player, "&4Invalid color type!");
+                                util.sendMessage(player, "&6Available formats:" + "\n" + AVAILABLE_COLORS);
                             }
-                        }
+                            break;
                     }
                 } else {
-                    ImpurityNC.sendMessage(player, "&6Available colors:" + "\n" + available());
+                    util.sendMessage(player, "&6Available colors:" + "\n" + AVAILABLE_COLORS);
                 }
             } else {
-                ImpurityNC.sendMessage(player, "&6Sorry, you must donate to use name color.");
+                util.sendMessage(player, "&6Sorry, you don't have access to change your name color!");
             }
         }
         return true;
@@ -118,9 +106,5 @@ public class NameColor implements CommandExecutor, Listener {
         inc.getPlayers().set(String.valueOf(player.getUniqueId()), name);
         inc.saveConfig();
         inc.reloadPlayerData();
-    }
-
-    private String available() {
-        return ChatColor.translateAlternateColorCodes('&', "&4dark_red &cred &6gold &eyellow &2dark_green &agreen &baqua &3dark_aqua &1dark_blue &9blue &dlight_purple &5dark_purple &7gray &8dark_gray &0black&r &4r&6a&ei&2n&9b&1o&5w&r &lbold&r &mstrikethrough&r &nunderline&r &oitalic&r random reset");
     }
 }
