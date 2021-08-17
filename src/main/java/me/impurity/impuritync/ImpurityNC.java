@@ -14,25 +14,9 @@ import java.io.File;
 import java.io.IOException;
 
 public final class ImpurityNC extends JavaPlugin {
-    public File file = new File(getDataFolder(), "players.yml");
-    PluginManager pl = getServer().getPluginManager();
-    private FileConfiguration players;
-
-    public static ImpurityNC getPlugin() {
-        return getPlugin(ImpurityNC.class);
-    }
-
-    public static void sendMessage(Object player, String message) {
-        if (player instanceof Player) {
-            Player casted = (Player) player;
-            casted.sendMessage(ChatColor.translateAlternateColorCodes('&', message));
-        } else {
-            if (player instanceof CommandSender) {
-                CommandSender casted = (CommandSender) player;
-                casted.sendMessage(ChatColor.translateAlternateColorCodes('&', message));
-            }
-        }
-    }
+    private YamlConfiguration players;
+    private PluginManager pl;
+    private Util util;
 
     public FileConfiguration getPlayers() {
         return players;
@@ -54,29 +38,8 @@ public final class ImpurityNC extends JavaPlugin {
         saveConfig();
     }
 
-    private FileConfiguration makeConfig() {
-        try {
-            if (!file.exists()) {
-                file.createNewFile();
-            }
-            YamlConfiguration config = new YamlConfiguration();
-            config.load(file);
-            return config;
-        } catch (IOException | InvalidConfigurationException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    public void saveConfig() {
-        try {
-            players.save(file);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void reloadPlayers() {
-        makeConfig();
+    public void reloadPlayerData() {
+        util.loadPlayerData();
+        players = util.getPlayerData();
     }
 }
