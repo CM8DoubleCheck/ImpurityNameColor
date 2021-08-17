@@ -1,2 +1,2 @@
 # ImpurityNameColor
-gay plugin to do name color shit
+Fork of ImpurityNameColor with minor improvements and cleaned code 
