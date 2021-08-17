@@ -1,17 +1,12 @@
 package me.impurity.impuritync;
 
 import me.impurity.impuritync.command.NameColor;
+import me.impurity.impuritync.listener.JoinEvent;
 import org.bukkit.ChatColor;
-import org.bukkit.command.CommandSender;
-import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import java.io.File;
-import java.io.IOException;
 
 public final class ImpurityNC extends JavaPlugin {
     private YamlConfiguration players;
@@ -24,22 +19,29 @@ public final class ImpurityNC extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        if (!getDataFolder().exists()) {
-            getDataFolder().mkdir();
-        }
-        players = makeConfig();
-        getCommand("nc").setExecutor(new NameColor());
-        pl.registerEvents(new NameColor(), this);
+
+        if (!getDataFolder().exists()) getDataFolder().mkdir();
+
+        util = new Util(this);
+        pl = getServer().getPluginManager();
+        reloadPlayerData();
+
+        getCommand("nc").setExecutor(new NameColor(this));
+        pl.registerEvents(new JoinEvent(this), this);
         getLogger().info(ChatColor.GREEN + "ImpurityNC by SevJ6 enabled!");
     }
 
     @Override
     public void onDisable() {
-        saveConfig();
+        util.savePlayerData();
     }
 
     public void reloadPlayerData() {
         util.loadPlayerData();
         players = util.getPlayerData();
+    }
+
+    public Util getUtil() {
+        return util;
     }
 }
