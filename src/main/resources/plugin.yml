@@ -5,4 +5,5 @@ authors: [SevJ6, CM8DoubleCheck]
 description: Name color plugin for impurity.me
 commands:
   nc:
-    description: do name stuff larp
+    description: Changes your name color
+    permission: ImpurityNC.use
